@@ -1,0 +1,31 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+// Tauri expects a fixed port and to fail if that port is unavailable.
+// https://v2.tauri.app/start/frontend/vite/
+export default defineConfig(() => ({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+
+  // Vite dev server config tuned for Tauri.
+  clearScreen: false,
+  server: {
+    port: 1420,
+    strictPort: true,
+    host: "0.0.0.0",
+    watch: {
+      // Don't watch the src-tauri directory from the frontend dev server.
+      ignored: ["**/src-tauri/**"],
+    },
+  },
+  envPrefix: ["VITE_", "TAURI_"],
+  build: {
+    target: process.env.TAURI_ENV_PLATFORM === "windows" ? "chrome105" : "safari13",
+    minify: process.env.TAURI_ENV_DEBUG ? (false as const) : ("esbuild" as const),
+    sourcemap: !!process.env.TAURI_ENV_DEBUG,
+  },
+}));

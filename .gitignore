@@ -1,0 +1,42 @@
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Vite
+.vite/
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/Cargo.lock.bak
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# App local data (dev)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+.dev-data/
+
+# Env
+.env
+.env.local
+
+# Phase15: Auto Update署名鍵。秘密鍵は絶対にコミットしない
+# (docs/UPDATE_RELEASE.md参照)。
+*.key
+!*.key.pub

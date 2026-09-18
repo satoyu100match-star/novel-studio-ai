@@ -1,0 +1,57 @@
+name: release
+
+# Phase15 (Auto Update, docs/UPDATE_RELEASE.md参照)。
+#
+# `v*` 形式のタグ(例: v0.1.1)をpushすると、GitHub純正のWindowsランナー
+# 上で `pnpm tauri build` を実行し、署名付きのインストーラーと
+# アップデート用成果物を作成、GitHub Releaseとして公開する
+# (`tauri-apps/tauri-action` が latest.json の生成・アップロードまで
+# 自動で行う)。これにより、開発者(あなたのPC)側では毎回の
+# アンインストール/再インストールが不要になり、既存ユーザーは
+# アプリ内の「アップデートを確認」または起動時の自動確認だけで
+# 新バージョンに気づける。
+#
+# 事前準備(このリポジトリのSettings > Secrets and variables > Actions):
+#   - TAURI_SIGNING_PRIVATE_KEY: novel-studio-ai-update.key の中身(全文)
+#   - TAURI_SIGNING_PRIVATE_KEY_PASSWORD: 鍵のパスワード(パスワード無しで
+#     生成した場合は空文字列を設定)
+# GITHUB_TOKEN はActionsが自動で用意するため、追加設定は不要。
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Novel Studio AI ${{ github.ref_name }}"
+          releaseBody: "CHANGELOG.md を参照してください。"
+          releaseDraft: true
+          prerelease: false

@@ -1,0 +1,1229 @@
+@import "./theme.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  /* Windows first (spec #17); Japanese IME composition must never be
+     interrupted by layout shifts from font loading, so we lean on system
+     fonts rather than a webfont for UI chrome. */
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-shell__topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.theme-select {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-text);
+  padding: 4px 8px;
+}
+
+.app-shell__content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Phase 8: Crash Recovery banner -------------------------------------- */
+
+.recovery-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 12px;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-shell__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 32px;
+}
+
+.app-shell__body--scroll {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.app-shell__statusbar {
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  padding: 6px 16px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 480px;
+  width: 100%;
+}
+
+.card h1 {
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+
+.card p {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+
+.field-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.field-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+/*
+ * ボタンは横幅の狭いカラム(世界観項目の「世界観項目」列=140px等)で
+ * inputに押し潰されると、文字が縦に折り返されて見切れる不具合が
+ * あったため、常に自分のコンテンツ幅を保つようにする(縮めない・
+ * 折り返さない)。
+ */
+.field-row button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+button.primary {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.status-line {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  min-height: 16px;
+}
+
+.error-boundary {
+  margin: 32px auto;
+  max-width: 560px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-danger);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.error-boundary h1 {
+  color: var(--color-danger);
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.error-boundary pre {
+  background: var(--color-bg-sunken);
+  padding: 12px;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+/* --- Project list ------------------------------------------------- */
+
+.project-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.project-list__row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.project-list__item {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--color-text);
+}
+
+.project-list__item:hover {
+  background: var(--color-bg-sunken);
+}
+
+.project-list__title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.project-list__meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* --- Workspace (3-pane layout) ------------------------------------- */
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.workspace__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.workspace__title {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+}
+
+.workspace__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 240px 1fr 280px;
+}
+
+.workspace__pane {
+  min-height: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--color-border);
+}
+
+.workspace__pane--nav {
+  background: var(--color-bg-elevated);
+  padding: 8px;
+}
+
+.workspace__pane--editor {
+  border-right: 1px solid var(--color-border);
+  display: flex;
+}
+
+.workspace__pane--side {
+  border-right: none;
+  background: var(--color-bg-elevated);
+  padding: 8px;
+}
+
+/* --- Navigator ------------------------------------------------------ */
+
+.navigator__heading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin: 4px 8px;
+}
+
+.nav-tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-tree--nested {
+  padding-left: 20px;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+}
+
+.nav-row--selected {
+  background: var(--color-accent);
+}
+.nav-row--selected .nav-row__title,
+.nav-row--selected .nav-row__meta {
+  color: var(--color-accent-contrast);
+}
+
+.nav-row__disclosure {
+  width: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.nav-row__label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  text-align: left;
+  color: var(--color-text);
+}
+
+.nav-row__title {
+  font-size: 13px;
+}
+
+.nav-row__meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.nav-add {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.nav-add--indent {
+  padding-left: 26px;
+}
+
+.nav-add-form input {
+  width: 90%;
+  margin: 2px 6px;
+  padding: 3px 6px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* --- Editor ----------------------------------------------------------- */
+
+.editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.editor--empty {
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+
+.editor__toolbar {
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.editor__textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 24px 48px;
+  font-family: var(--font-manuscript);
+  font-size: 16px;
+  line-height: 2;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.editor--focus .editor__toolbar {
+  display: none;
+}
+
+.editor__statusline {
+  display: flex;
+  gap: 16px;
+  padding: 6px 16px;
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.editor__save-status {
+  margin-left: auto;
+}
+
+/* --- Search panel ------------------------------------------------------ */
+
+.search-panel__input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.search-panel__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-hit {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--color-text);
+}
+
+.search-hit__title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.search-hit__snippet {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* --- Modal / forms ------------------------------------------------------ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  max-width: 640px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 12px;
+  max-height: 55vh;
+  overflow-y: auto;
+  margin: 0;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.form-label input,
+.form-label textarea {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+/* --- Phase13: AI機能の操作フロー表示 -------------------------------------- */
+
+.ai-flow-steps {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.ai-flow-steps__step {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-bg-sunken);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.ai-flow-steps__step--active {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border-color: var(--color-accent);
+}
+
+.ai-feature-description {
+  margin: -6px 0 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* --- Genkou-youshi (manuscript paper) view, Phase 2 ---------------------- */
+
+:root {
+  --ms-cell-size: 28px;
+}
+
+.genkou {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.genkou__toolbar,
+.genkou__pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.genkou__toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.genkou__toolbar select {
+  font-size: 12px;
+  padding: 2px 4px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.genkou__zoom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.genkou__pager {
+  justify-content: center;
+}
+
+.genkou__viewport {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  background: var(--color-bg-sunken);
+}
+
+.ms-page {
+  display: inline-block;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  font-family: var(--font-manuscript);
+  font-size: calc(var(--ms-cell-size) * var(--ms-zoom, 1) * 0.6);
+}
+
+.ms-page--offscreen {
+  display: none;
+}
+
+.ms-page--horizontal {
+  writing-mode: horizontal-tb;
+}
+
+.ms-page--vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+.ms-line {
+  white-space: nowrap;
+}
+
+.ms-page--horizontal .ms-line {
+  height: calc(var(--ms-cell-size) * var(--ms-zoom, 1));
+}
+
+.ms-page--vertical .ms-line {
+  width: calc(var(--ms-cell-size) * var(--ms-zoom, 1));
+}
+
+.ms-cell {
+  display: inline-block;
+  width: calc(var(--ms-cell-size) * var(--ms-zoom, 1));
+  height: calc(var(--ms-cell-size) * var(--ms-zoom, 1));
+  box-sizing: border-box;
+  text-align: center;
+  vertical-align: top;
+  position: relative;
+  border-right: 1px dotted var(--color-border);
+  border-bottom: 1px dotted var(--color-border);
+}
+
+.ms-cell--tcy .ms-cell__char {
+  text-combine-upright: all;
+}
+
+.ms-cell--bouten .ms-cell__char::after {
+  content: "\30FB";
+  position: absolute;
+  top: -0.7em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6em;
+  color: var(--color-accent);
+}
+
+.ms-cell__ruby {
+  position: absolute;
+  font-size: 0.45em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  top: -1em;
+  left: 0;
+  width: calc(var(--ruby-span, 1) * 100%);
+  text-align: center;
+}
+
+.ms-page--vertical .ms-cell__ruby {
+  top: 0;
+  left: -1.1em;
+  width: auto;
+  height: calc(var(--ruby-span, 1) * 100%);
+  writing-mode: vertical-rl;
+}
+
+/* --- Workspace section tabs (Phase 3) ------------------------------- */
+
+.workspace__section-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+
+.section-tab {
+  background: transparent;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.section-tab--active {
+  background: var(--color-bg-sunken);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.workspace__body--single {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  /* Phase15追加調査で判明: 各パネル(エクスポート/ゴミ箱/人物相関等)の
+     中には自前のスクロール領域を持たず`.detail-form`/`.card`を直接
+     置いているものがあり、内容がウィンドウの高さを超えると
+     (このコンテナにoverflowの指定が無かったため)下端で見た目上
+     切れてしまっていた。各パネル個別にスクロール処理を持たせる代わり、
+     この単一ペインの共通の親でスクロールを保証する(内部で既に
+     `overflow-y: auto`を持つパネル[AI/分析/リスト系]には影響しない)。 */
+  overflow-y: auto;
+}
+
+/* --- Generic entity list/detail layout (Characters/World/Notes) ----- */
+
+.section-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.section-layout__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px 0;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+}
+
+.tab--active {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.section-layout__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+
+.section-layout__body--with-categories {
+  grid-template-columns: 140px 240px 1fr;
+}
+
+.section-layout__categories {
+  padding: 10px;
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notes-folder-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  padding: 4px 6px;
+}
+
+.section-layout__list {
+  padding: 10px;
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-layout__detail {
+  padding: 16px 24px;
+  overflow-y: auto;
+}
+
+.entity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.entity-list__item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.entity-list__item:hover {
+  background: var(--color-bg-sunken);
+}
+
+.entity-list__item--selected {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.entity-list__meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.entity-list__item--selected .entity-list__meta {
+  color: var(--color-accent-contrast);
+  opacity: 0.85;
+}
+
+.detail-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 640px;
+}
+
+.detail-form__group {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-form__group legend {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  padding: 0 4px;
+}
+
+.tag-input__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-bg-sunken);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.tag-chip button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.tag-input input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.relation-list,
+.glossary-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.relation-list li,
+.glossary-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 8px;
+  font-size: 13px;
+}
+
+/* --- Phase 4: Plot Board -------------------------------------------- */
+
+.plot-board {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.plot-board__lane {
+  flex: 0 0 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 0;
+}
+
+.plot-board__lane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 4px;
+}
+
+.plot-board__lane-count {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.plot-board__cards {
+  flex: 1;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+.plot-board__card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plot-board__card--dragging {
+  opacity: 0.5;
+}
+
+.plot-board__card-title {
+  font-weight: 600;
+}
+
+.plot-board__card-summary {
+  color: var(--color-text-muted);
+  white-space: pre-wrap;
+}
+
+.plot-board__card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.plot-board__add-lane {
+  flex: 0 0 200px;
+}
+
+/* --- Phase 4: Timeline / Foreshadowing / TODO ------------------------ */
+
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.timeline-list__item {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeline-list__date {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.status-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-bg-sunken);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.status-badge--resolved {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border-color: var(--color-accent);
+}
+
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.todo-list__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.todo-list__item:hover {
+  background: var(--color-bg-sunken);
+}
+
+.todo-list__title {
+  flex: 1;
+  font-size: 13px;
+}
+
+.todo-list__title--done {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+/* --- Phase 4: Comments panel ----------------------------------------- */
+
+.comments-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.comments-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.comment-card {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comment-card--resolved {
+  opacity: 0.6;
+}
+
+.comment-card__quote {
+  border-left: 2px solid var(--color-accent);
+  padding-left: 6px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+.comment-card__body {
+  white-space: pre-wrap;
+}
+
+.comment-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* --- Phase 6: AI diff view -------------------------------------------- */
+
+.diff-view {
+  white-space: pre-wrap;
+  line-height: 1.9;
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.diff-view__insert {
+  background: color-mix(in srgb, #2e9e5b 25%, transparent);
+  text-decoration: none;
+}
+
+.diff-view__delete {
+  background: color-mix(in srgb, #d9534f 20%, transparent);
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+/* --- Phase 7: 高度AI分析 / 可読性分析 ---------------------------------- */
+
+.comment-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.readability-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin: 0;
+}
+
+.readability-stats__row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+}
+
+.readability-stats__row dt {
+  color: var(--color-text-muted);
+}
+
+.readability-stats__row dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media print {
+  .app-shell__topbar,
+  .workspace__header,
+  .workspace__pane--nav,
+  .workspace__pane--side,
+  .genkou__toolbar,
+  .genkou__pager,
+  .app-shell__statusbar {
+    display: none !important;
+  }
+  .genkou__viewport {
+    overflow: visible;
+    background: white;
+  }
+  .ms-page--offscreen {
+    display: inline-block !important;
+  }
+  .ms-page {
+    box-shadow: none;
+    page-break-after: always;
+  }
+}

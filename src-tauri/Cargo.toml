@@ -1,0 +1,46 @@
+[package]
+name = "novel-studio-ai"
+version = "0.1.0"
+description = "Novel Studio AI - AI-assisted novel writing IDE"
+authors = ["Novel Studio AI Contributors"]
+license = ""
+repository = ""
+edition = "2021"
+rust-version = "1.77.2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.11.3", features = [] }
+tauri-plugin-log = "2"
+# Bundled SQLite: no system libsqlite3-dev dependency, portable across
+# Windows / macOS / Linux, which matters since Windows is the primary target.
+rusqlite = { version = "0.32", features = ["bundled"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2"
+# Phase 5 (AI基盤) の一時ファイル用。本来はHTTPクライアントに専用のcrate
+# (ureq/reqwest等)を追加したいが、この開発環境ではcrates.ioの新規crate
+# 取得がネットワーク障害で行えなかった(index.crates.ioへの新規パッケージ
+# 問い合わせが継続的にタイムアウト。詳細はCLAUDE.md「既知の問題」参照)。
+# 既に(devとして)ロック済みでローカルにキャッシュされている `tempfile` の
+# みを実行時にも使い、HTTP通信自体はOS標準搭載の `curl` をサブプロセス
+# 起動して行う(`src-tauri/src/ai/http_client.rs`)。ネットワークが復旧し
+# 次第、専用クレートへの置き換えを検討する。
+tempfile = "3"
+zip = { version = "4.2.0", default-features = false, features = ["deflate"] }
+printpdf = { version = "0.11.1", default-features = false }
+tauri-plugin-updater = "2.11.0"
+tauri-plugin-process = "2.3.1"
+
+[dev-dependencies]

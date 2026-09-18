@@ -1,0 +1,85 @@
+/**
+ * Design direction (spec #9): calm, professional, minimal -- not a
+ * "gaming" UI. Colors live only here as CSS custom properties; components
+ * must not hardcode hex values, so a future accent-color setting (spec
+ * #9: "アクセントカラーは設定変更可能にする") only has to change this file.
+ */
+
+:root,
+:root[data-theme="light"] {
+  --color-bg: #faf9f7;
+  --color-bg-elevated: #ffffff;
+  --color-bg-sunken: #f1efec;
+  --color-border: #e2ded7;
+  --color-text: #2b2620;
+  --color-text-muted: #6f6a62;
+  --color-accent: #7a5c3e;
+  --color-accent-contrast: #ffffff;
+  --color-danger: #b3402f;
+  --color-success: #4c7a4f;
+
+  --font-ui: "Yu Gothic UI", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  --font-manuscript: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #1c1a17;
+  --color-bg-elevated: #26231f;
+  --color-bg-sunken: #15130f;
+  --color-border: #3a352d;
+  --color-text: #ece7de;
+  --color-text-muted: #a89f8f;
+  --color-accent: #c69a6d;
+  --color-accent-contrast: #1c1a17;
+  --color-danger: #e0776a;
+  --color-success: #82b08a;
+}
+
+/*
+ * Phase13: Light/Darkに続く追加テーマ(仕様#9「アクセントカラーは設定
+ * 変更可能にする」の延長)。色・アクセントのみを変え、フォント
+ * (--font-ui/--font-manuscript)は据え置く -- 原稿用紙の組版
+ * (typeset.ts)や日本語IME入力の見え方に影響を与える変更は避け、
+ * 「エディタ領域の視認性を最優先する」方針(CLAUDE.md)を崩さないため。
+ * いずれのテーマもテキストと背景のコントラストは light/dark と同程度に
+ * 保っている。
+ */
+
+:root[data-theme="cute"] {
+  --color-bg: #fff5f8;
+  --color-bg-elevated: #ffffff;
+  --color-bg-sunken: #ffe9f0;
+  --color-border: #f3c9dc;
+  --color-text: #4a2b3a;
+  --color-text-muted: #8a6478;
+  --color-accent: #ec6f9b;
+  --color-accent-contrast: #ffffff;
+  --color-danger: #d1476a;
+  --color-success: #4c9a7a;
+}
+
+:root[data-theme="cool"] {
+  --color-bg: #10151f;
+  --color-bg-elevated: #182234;
+  --color-bg-sunken: #0a0e16;
+  --color-border: #2b3a52;
+  --color-text: #e4ecf7;
+  --color-text-muted: #93a4bf;
+  --color-accent: #3fa9f5;
+  --color-accent-contrast: #08111c;
+  --color-danger: #ef5f6f;
+  --color-success: #4fd19a;
+}
+
+:root[data-theme="punk"] {
+  --color-bg: #0c0c0d;
+  --color-bg-elevated: #17171a;
+  --color-bg-sunken: #050505;
+  --color-border: #3a3833;
+  --color-text: #f4f1ea;
+  --color-text-muted: #b7b2a6;
+  --color-accent: #ff2d78;
+  --color-accent-contrast: #0c0c0d;
+  --color-danger: #ff4d4d;
+  --color-success: #baff29;
+}
