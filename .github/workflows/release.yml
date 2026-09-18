@@ -13,8 +13,11 @@ name: release
 #
 # 事前準備(このリポジトリのSettings > Secrets and variables > Actions):
 #   - TAURI_SIGNING_PRIVATE_KEY: novel-studio-ai-update.key の中身(全文)
-#   - TAURI_SIGNING_PRIVATE_KEY_PASSWORD: 鍵のパスワード(パスワード無しで
-#     生成した場合は空文字列を設定)
+#   - TAURI_SIGNING_PRIVATE_KEY_PASSWORD: 鍵のパスワード。パスワード無しで
+#     生成した場合は、このSecret自体を作成しない(GitHubのSecret入力欄は
+#     空文字を保存できないため、無理に空白等を入れると
+#     `incorrect updater private key password`で失敗する。Secretが
+#     存在しなければ、下のenvでは自動的に空文字として扱われる)
 # GITHUB_TOKEN はActionsが自動で用意するため、追加設定は不要。
 
 on:

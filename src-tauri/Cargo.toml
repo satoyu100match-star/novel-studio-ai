@@ -42,5 +42,6 @@ zip = { version = "4.2.0", default-features = false, features = ["deflate"] }
 printpdf = { version = "0.11.1", default-features = false }
 tauri-plugin-updater = "2.11.0"
 tauri-plugin-process = "2.3.1"
+keyring = { version = "3.6.3", features = ["windows-native", "apple-native", "sync-secret-service"] }
 
 [dev-dependencies]

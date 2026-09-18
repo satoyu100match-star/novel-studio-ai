@@ -14,8 +14,8 @@ const SETTING_KEYS = {
 /**
  * AI設定画面(仕様#45)。Provider / Model / API Key / Base URL / Temperature
  * / Max Output。APIキーはこのフォームから送信するだけで、フロントに
- * 戻ってくることは二度とない(ai::keystoreがRust側メモリ上にのみ保持する
- * 方式。docs/AI.md 3章、CLAUDE.md既知の問題参照)。
+ * 戻ってくることは二度とない(Phase17: ai::keystoreがOSの資格情報ストア
+ * 経由で保存する方式。docs/AI.md 3章参照)。
  */
 export function AiSettingsForm() {
   const [providerKinds, setProviderKinds] = useState<string[]>([]);
@@ -81,9 +81,11 @@ export function AiSettingsForm() {
     <form className="detail-form" onSubmit={handleSave}>
       <div className="status-line" style={{ maxWidth: 640 }}>
         AI機能は完全に任意です。APIキーを設定しなくても通常の執筆機能は
-        すべて利用できます。APIキーはディスクへ保存せず、アプリ実行中のみ
-        メモリ上に保持されます(既知の制約。詳細はCLAUDE.md参照) —
-        アプリを再起動すると再入力が必要です。
+        すべて利用できます。APIキーはこのアプリのファイルやデータベース
+        には一切保存されず、お使いのOSの資格情報ストア(Windowsの資格情報
+        マネージャー等)に保存されます。一度設定すればアプリを再起動しても
+        再入力は不要です(その環境でOSの資格情報ストアが利用できない場合は、
+        今回の起動中のみの一時的な保持になります)。
       </div>
       <label className="form-label">
         AI Provider

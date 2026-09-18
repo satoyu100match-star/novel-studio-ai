@@ -106,14 +106,23 @@ pnpm tauri build
 
 ## 5. 動作確認状況(既知の制約)
 
-- このサンドボックス環境では、実際にGitHub Releaseを介した更新の
-  ダウンロード・適用・再起動までは検証できていない(署名鍵の生成と、
-  プラグインの組み込み・`cargo build`・Xvfb起動確認までは実施済み)。
-  実際にリリースを1つ公開し、旧バージョンのアプリから更新できることを
-  確認するまでは、既知の制約として扱う。
-- GitHub Actionsのワークフロー(`.github/workflows/release.yml`)自体も
-  実際に一度動かして確認するまでは未検証。Windowsランナー上での
-  `cargo`/`pnpm`のセットアップは`dtolnay/rust-toolchain`と
-  `pnpm/action-setup`という広く使われている公式アクションに任せている
-  ため大きな問題は起きにくいはずだが、初回実行時にエラーが出たら
-  ログを確認すること。
+- 2026-09-19、`v0.1.0`タグのpushにより`.github/workflows/release.yml`
+  (GitHub Actions)を実際に稼働させ、Windowsランナー上での署名付き
+  ビルド・`latest.json`生成・GitHub Release Draftの作成・
+  「Publish release」による公開までを実機で確認済み。
+  初回実行時は`TAURI_SIGNING_PRIVATE_KEY_PASSWORD`のSecretに
+  (GitHubのSecret入力欄が空文字を受け付けなかったため)誤って
+  半角スペース1文字を入れてしまっており、`failed to decode secret
+  key: incorrect updater private key password`で失敗した。原因は
+  鍵が本来パスワード無し(空文字列)で生成されていたため、スペース
+  1文字でも不一致になったこと。**対処**: そのSecretを「空文字で
+  保存」ではなく「削除」する(Secretが存在しない場合、ワークフロー内
+  の`${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}`は自動的に
+  空文字として評価されるため、GitHubのUI制限を回避できる)。削除後に
+  「Re-run all jobs」で再実行し、成功を確認した。
+- 上記の通りビルド・署名・Release公開の一連の流れは実機で検証済みだが、
+  **既存インストール済みアプリが実際に新バージョンを検知してダウン
+  ロード・適用・再起動できることの確認は、次にバージョンを上げて
+  (`v0.1.1`等)リリースした際に行うこと**(現時点で公開されているのは
+  最初のバージョンv0.1.0のみで、比較対象となる「新しいバージョン」が
+  まだ存在しないため)。

@@ -2,6 +2,45 @@
 
 All notable changes to this project are documented in this file.
 
+## [Phase 17] - 0.1.1 - 2026-09-19
+
+### Changed
+
+- AIのAPIキーを、OSの資格情報ストア(Windows Credential Manager /
+  macOS Keychain / Linux Secret Service)へ`keyring`クレート経由で
+  保存するように変更した(`src-tauri/src/ai/keystore.rs`)。Phase5
+  実装時点ではこの開発環境からcrates.ioへの新規クレート取得ができず、
+  ディスクへ永続化しないメモリのみの保持方式にしていたため、アプリを
+  再起動するたびにAPIキーの再入力が必要だった。ネットワーク制約が
+  解消されたため、CLAUDE.mdに記していた通りOS資格情報ストア連携へ
+  置き換え、**一度設定すればアプリを再起動しても再入力不要**になった。
+  自前の暗号化コードは一切書かず、各OSが提供する既存の安全な仕組みに
+  そのまま委ねている。資格情報ストア自体が利用できない環境(D-Bus
+  Secret Serviceが起動していないLinux環境等)では、保存・読み込みの
+  失敗をログに警告として記録した上で、その場のセッション中のみメモリ
+  上で動作を継続する(AI機能やアプリの起動自体は止めない)。フロント
+  エンドから見た挙動(APIキーの値がフロントへ二度と返らないこと、設定
+  有無の真偽値のみやり取りすること)は変更していない
+- Auto Update(Phase15)の実地テストを兼ね、バージョンを0.1.1へ
+  上げた(`package.json`/`src-tauri/tauri.conf.json`)
+
+### 動作確認済み
+
+- `cargo build`、`cargo test`(54件、`ai::keystore`にプロバイダー間で
+  キーが混ざらないことを確認する1件を追加)
+- `pnpm typecheck` / `pnpm lint` / `pnpm test`(40件、UI文言のみの変更
+  のため件数据え置き) / `pnpm build` すべて成功
+- Xvfb実機起動でアプリが正常に立ち上がることを確認
+
+### 既知の制約
+
+- 実際のOS資格情報ストア(Windows Credential Manager等)との往復動作は
+  このクラウドサンドボックスからは検証できない(`cargo test`の
+  ユニットテストは、資格情報ストアが使えない場合のフォールバック経路
+  ——メモリキャッシュ——のみを検証している)。実際に「APIキーを設定→
+  アプリを再起動→再入力なしで使える」ことの確認はWindows実機で行う
+  必要がある
+
 ## [Phase 16] - 2026-09-19
 
 ### Fixed
@@ -79,18 +118,14 @@ All notable changes to this project are documented in this file.
 
 ### 既知の制約
 
-- このサンドボックス環境では、実際にGitHub Releaseを介した更新の
-  ダウンロード・適用・再起動までは検証できていない(署名鍵の生成、
-  プラグインの組み込み、`cargo build`、Xvfb起動確認までは実施済み)。
-  実際にリリースを1つ公開し、旧バージョンのアプリから更新できることを
-  確認するまでは既知の制約として扱う
-- `.github/workflows/release.yml`自体も実際に一度動かして確認するまで
-  未検証
-- `tauri.conf.json`の`plugins.updater.endpoints`は
-  `https://github.com/satoyu100match-star/novel-studio-ai/releases/
-  latest/download/latest.json`に確定した。ただしこのリポジトリへの
-  最初のリリース公開が済むまではアップデート確認は「更新なし」と
-  同じ挙動になる(通常の起動・執筆機能には影響しない)
+- 追記(2026-09-19): ユーザー実機で`v0.1.0`タグをリリースし、
+  `.github/workflows/release.yml`によるビルド・署名・GitHub Release
+  公開までの一連の流れが実際に動作することを確認した(1回目は
+  `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`Secretの設定ミスで失敗したが、
+  原因特定→Secret削除→再実行で解決。詳細: `docs/UPDATE_RELEASE.md`
+  5章)。残る既知の制約は、既存インストール済みアプリが実際に新
+  バージョンを検知してダウンロード・適用・再起動できることの確認
+  のみで、これは次のバージョン(例: v0.1.1)をリリースした時点で行う
 
 ## [Phase 14] - 2026-09-19
 

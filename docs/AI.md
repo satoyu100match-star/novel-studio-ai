@@ -42,9 +42,9 @@ AIに毎回作品全文を丸ごと渡さない。Context Builderが必要な情
 ## 3. APIキーの扱い
 
 - ソースコードに埋め込まない（最重要方針#11）。
-- SQLiteへ平文保存しない。可能な場合はOS Credential Store
-  （Windows: Credential Manager / macOS: Keychain）を利用する。実装候補:
-  `keyring` crate 等、Tauri側で管理しフロントには渡さない。
+- SQLiteへ平文保存しない。OS Credential Store（Windows: Credential
+  Manager / macOS: Keychain / Linux: Secret Service）を`keyring` crate
+  経由で利用する（Phase17）。Tauri側で管理しフロントには渡さない。
 - Gitへcommitしない、ログへ表示しない、エラー画面へ全文表示しない（仕様#82）。
 
 ## 4. AIによる本文変更フロー（必ずこの順序）
@@ -98,16 +98,22 @@ Context Inspector（`src/features/ai/ContextInspector.tsx`）・作品専用
    引数には一切載せない設計にしているため、`ps`等でのAPIキー漏洩は
    防いでいる。Windows 10 (1803以降)/macOS/Linuxいずれも`curl`を標準
    搭載しているため追加インストールは不要という前提。
-2. **APIキーの保存**: `keyring`クレートを使ったOS資格情報ストア連携が
-   本来の設計だが未導入のため、**ディスクへの永続化を一切行わず**
-   アプリ実行中のみRust側メモリ上に保持する方式にした
-   （`src-tauri/src/ai/keystore.rs`）。生半可な自前暗号化（同じフォルダに
-   鍵と暗号文を並べるだけの方式等）は実質平文と同じ安全性しかなく、
-   誤った安心感を与えるため採用しなかった。この結果、**アプリを再起動
-   するたびにAPIキーの再入力が必要**（データ安全性を執筆体験より優先
-   する方針— CLAUDE.md優先順位表 — に基づく判断）。
+2. **APIキーの保存**: Phase5時点では`keyring`クレートが未導入のため、
+   ディスクへの永続化を一切行わずアプリ実行中のみRust側メモリ上に
+   保持する方式にしていた。**Phase17でネットワーク制約が解消され、
+   `keyring`クレート経由でOS資格情報ストア（Windows Credential
+   Manager / macOS Keychain / Linux Secret Service）に保存する本来の
+   設計へ置き換え済み**（`src-tauri/src/ai/keystore.rs`）。自前の暗号化
+   コードは一切書かず、各OSが提供する既存の安全な仕組みにそのまま
+   委ねている。これにより、一度設定したAPIキーはアプリを再起動しても
+   再入力不要になった。OS資格情報ストア自体が利用できない環境（D-Bus
+   Secret Serviceが起動していないLinux環境等）では、保存・読み込みの
+   失敗をログに警告として記録した上で、その場のセッション中のみメモリ
+   上で動作を継続する（AI機能自体やアプリの起動を止めない）。
 
 いずれもCI/この環境でのテストでは実APIキーを消費しない
-（`ai::keystore`はメモリ上のHashMapなのでユニットテストで直接検証済み。
-実プロバイダーとの疎通は本サンドボックスのネットワーク許可リスト外の
-ホストが多く未検証 — Windows実機検証と同様の既知の制約）。
+（`ai::keystore`はユニットテストで直接検証済み。実際のOS資格情報ストア
+との往復動作はCI/クラウドサンドボックスからは検証できないため、
+Windows実機での確認が必要。実プロバイダーとの疎通は本サンドボックスの
+ネットワーク許可リスト外のホストが多く未検証 — Windows実機検証と同様の
+既知の制約）。

@@ -1,7 +1,7 @@
 {
   "name": "novel-studio-ai",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.1",
   "type": "module",
   "description": "AI-assisted novel writing IDE (desktop, Tauri + React + TypeScript)",
   "scripts": {

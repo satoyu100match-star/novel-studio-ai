@@ -98,9 +98,11 @@ pub fn run() {
             }
 
             app.manage(db);
-            // Phase 5: AIキーはディスクへ永続化せず、アプリ実行中のみ
-            // メモリ上に保持する(ai::keystore参照。keyringクレートを
-            // 導入できる環境になり次第、OS資格情報ストア経由に切り替える)。
+            // Phase 17: AIキーはOSの資格情報ストア(Windows Credential
+            // Manager / macOS Keychain / Linux Secret Service)へ`keyring`
+            // クレート経由で保存する(ai::keystore参照。Phase5時点では
+            // ネットワーク制約でkeyringクレートを導入できず、メモリのみの
+            // 保持だったため再起動のたびに再入力が必要だった)。
             app.manage(AiKeyStore::new());
 
             Ok(())

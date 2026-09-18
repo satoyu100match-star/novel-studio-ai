@@ -94,18 +94,20 @@ Calm）。過剰なゲーミングUIは禁止。Light/Dark両対応、アクセ�
 
 ## 現在のPhase
 
-**Phase 16（単一ペインセクションのスクロール不具合修正）— 完了**。
-計画していた全Phase(0〜11)完了後、リリース後の追加要望として着手した
-Phase12(作品設計チャット)・Phase13(テーマ拡張 + AI執筆支援の分かり
-やすさ改善)・Phase14(作品削除ボタンの不具合修正)・Phase15(Auto
-Update、GitHub上での実配信検証待ち)に続く5件目の追加対応。エクスポート
-画面等で、スクロールバーの無いまま下端の文字が見切れる不具合をユーザー
-報告により修正した(`.workspace__body--single`に`overflow-y: auto`が
-無かったことが原因。詳細: `docs/ROADMAP.md` Phase16)。Semantic Search/
-Map/Plugin architecture/Local AI/Cloud sync/Collaboration等は仕様書
-自身が「初期販売版には必須ではない」と明示する項目のため、引き続き
-意図的にスコープ外としている(理由: `docs/ROADMAP.md` Phase11)。詳細:
-`docs/ROADMAP.md`。
+**Phase 17（AIキーのOS資格情報ストア連携、v0.1.1）— 完了**。計画して
+いた全Phase(0〜11)完了後、リリース後の追加要望として着手したPhase12
+(作品設計チャット)・Phase13(テーマ拡張 + AI執筆支援の分かりやすさ
+改善)・Phase14(作品削除ボタンの不具合修正)・Phase15(Auto Update)・
+Phase16(単一ペインセクションのスクロール不具合修正)に続く6件目の
+追加対応。Phase5からの技術的負債だった「AIキーがメモリ上にしか保持
+されず、アプリ再起動のたびに再入力が必要」という制約を、`keyring`
+クレート経由のOS資格情報ストア連携に置き換えて解消した(詳細:
+`docs/ROADMAP.md` Phase17)。あわせてv0.1.1としてリリースし、Phase15で
+構築したAuto Update機構の実地テスト(既存アプリが新バージョンを検知
+できるか)も兼ねる。Semantic Search/Map/Plugin architecture/Local AI/
+Cloud sync/Collaboration等は仕様書自身が「初期販売版には必須ではない」
+と明示する項目のため、引き続き意図的にスコープ外としている(理由:
+`docs/ROADMAP.md` Phase11)。詳細: `docs/ROADMAP.md`。
 
 ## 完成済み機能
 
@@ -323,12 +325,23 @@ Map/Plugin architecture/Local AI/Cloud sync/Collaboration等は仕様書
   画面の高さを超えた内容がスクロールバーも無いまま下端で見切れて
   しまっていた(ユーザー報告により発覚)。共通の親コンテナ1箇所の修正で
   横断的に解消した(個々のパネルの修正は不要だった)
+- AIキーのOS資格情報ストア連携(Phase17、v0.1.1、
+  `src-tauri/src/ai/keystore.rs`): `keyring`クレート経由でWindows
+  Credential Manager / macOS Keychain / Linux Secret Serviceへ保存する
+  ようにし、Phase5からの技術的負債(アプリ再起動のたびにAPIキーの
+  再入力が必要)を解消した。自前の暗号化コードは書かず、各OSの既存の
+  安全な仕組みにそのまま委ねる。資格情報ストアが利用できない環境では
+  失敗をログに警告として記録した上でセッション中のみメモリで動作を
+  継続し、AI機能・アプリ自体は止めない。フロントエンドから見た挙動
+  (APIキーの値がフロントへ返らないこと)は変更なし
 - Vitest 40件（Phase3から31件で据え置きだったが、Phase12で
   `parseConceptDraft`等のパース処理を検証する5件、Phase13でテーマ拡張の
-  4件を新規追加。Phase14はUI配線のみの修正のため件数据え置き） /
-  `cargo test` 53件（Phase8で9件追加、Phase9で3件追加、Phase10で1件
-  追加、Phase12で1件追加: generate_conceptのプロンプトが全見出しを
-  含むことの確認。Phase13・Phase14はRust側の変更なしのため件数据え置き。
+  4件を新規追加。Phase14・Phase16はUI/CSS配線のみの修正のため件数据え
+  置き） / `cargo test` 54件（Phase8で9件追加、Phase9で3件追加、
+  Phase10で1件追加、Phase12で1件追加: generate_conceptのプロンプトが
+  全見出しを含むことの確認、Phase17で1件追加: `ai::keystore`でプロバ
+  イダー間でキーが混ざらないことの確認。Phase13・Phase14・Phase15・
+  Phase16はRust側のテスト対象の変更なしのため件数据え置き。
   sample_project::create が人物・世界観・原稿・プロット・時系列・伏線・
   TODOをすべて正しく生成することの確認は引き続きグリーン）、いずれも
   グリーン
@@ -453,12 +466,10 @@ Phase 5内でも以下は意図的に見送っている（詳細は`docs/AI.md` 
   OS標準搭載の`curl`をサブプロセス起動する暫定実装
   （`src-tauri/src/ai/http_client.rs`）。ネットワーク制約解消後に
   専用クレートへの置き換えを検討する技術的負債として記録する
-- **APIキーの永続化**: `keyring`クレート(OS資格情報ストア連携)が未導入
-  のため、ディスクへ一切保存せずアプリ実行中のみメモリ上に保持する
-  方式（`src-tauri/src/ai/keystore.rs`）。**アプリ再起動のたびに
-  APIキーの再入力が必要**。生半可な自前暗号化は実質平文と同じ安全性
-  しかなく誤った安心感を与えるため、データ安全性を優先しあえて非永続化
-  を選んだ判断
+- **APIキーの永続化**: 当時`keyring`クレート(OS資格情報ストア連携)が
+  未導入のため、ディスクへ一切保存せずアプリ実行中のみメモリ上に保持
+  する方式にしていた。**Phase17でOS資格情報ストア連携へ置き換え済み**
+  （`src-tauri/src/ai/keystore.rs`。詳細: `docs/ROADMAP.md` Phase17）
 - 実プロバイダー（Anthropic/OpenAI/Gemini等）との疎通は本サンドボックス
   の既知の制約（後述）により未検証
 - Rewrite preview・Diff表示UI（Phase6の推敲機能等とセットで実装予定）
@@ -532,11 +543,9 @@ Phase 1〜2内でも以下は意図的に見送っている
   `curl`をサブプロセス起動する暫定実装にした。ネットワーク制約が解消
   され次第、専用クレートへの置き換えを最優先で検討すること。詳細:
   `docs/AI.md` 8.1章。
-- 【Phase5】APIキーは同じ理由で`keyring`クレート(OS資格情報ストア連携)
-  が未導入のため、ディスクへ永続化せずアプリ実行中のみメモリ上に保持
-  している。アプリ再起動のたびに再入力が必要(データ安全性を優先した
-  意図的な判断であり、バグではない)。`keyring`クレートが導入可能に
-  なり次第、最優先でOS資格情報ストア連携に置き換えること。
+- 【Phase5→Phase17で解消】APIキーは当初`keyring`クレートが未導入のため
+  メモリ上にのみ保持していたが、Phase17でOS資格情報ストア連携に
+  置き換え済み。下記Phase17の項目を参照。
 - 【Phase5】実際のAIプロバイダー(Anthropic/OpenAI/Gemini等)とのAPI疎通
   は、本サンドボックスのネットワーク許可リストの都合上コード実装のみで
   未検証(Windows実機検証と同様の既知の制約)。実運用前に実際のAPIキーで
@@ -608,18 +617,27 @@ Phase 1〜2内でも以下は意図的に見送っている
   イベントハンドリングとルーティングの実装はコードレビューレベルでの
   確認に留まる。Windows実機での動作確認が必要)。
 - 【Phase15】Auto Updateは、プラグインの組み込み・`cargo build`・
-  Xvfb実機起動・署名鍵の生成まではこのサンドボックスで確認済みだが、
-  実際にGitHub Releaseを介した更新のダウンロード・適用・再起動までは
-  未検証(GitHub上での実際のリリースが必要なため)。
-  `.github/workflows/release.yml`自体が実際に動くことの確認も同様に
-  未実施。`tauri.conf.json`の`plugins.updater.endpoints`は
-  `https://github.com/satoyu100match-star/novel-studio-ai/releases/
-  latest/download/latest.json`に確定済みだが、このリポジトリへの
-  最初のリリース公開が済むまではアップデート確認は「更新なし」と
-  同じ挙動になる(通常の起動・執筆機能には影響しない)。詳細:
-  `docs/UPDATE_RELEASE.md`。
+  Xvfb実機起動・署名鍵の生成に加え、2026-09-19にユーザー実機で
+  `v0.1.0`タグのリリース(`.github/workflows/release.yml`によるビルド・
+  署名・GitHub Release公開)まで実施・成功を確認した(詳細・
+  つまずいた点: `docs/UPDATE_RELEASE.md` 5章)。`tauri.conf.json`の
+  `plugins.updater.endpoints`は`https://github.com/satoyu100match-star/
+  novel-studio-ai/releases/latest/download/latest.json`で稼働中。
+  残る既知の制約は、既存インストール済みアプリが実際に新バージョンを
+  検知してダウンロード・適用・再起動できることの確認のみで、これは
+  次にバージョンを上げてリリースした時点(例: v0.1.1)で行う(現時点
+  では比較対象の新バージョンがまだ存在しないため)。
 - 【Phase16】単一ペインセクションのスクロール修正は`pnpm typecheck`/
   `pnpm lint`/`pnpm test`/`pnpm build`が通ること、`cargo build`、
   Xvfb実機起動が正常なことは確認したが、CSSのスクロール挙動自体の
   目視確認はブラウザ/GUIビューアが無い本サンドボックスでは行えて
   いない(Windows実機での確認が必要)。
+- 【Phase17】AIキーのOS資格情報ストア連携は`cargo build`/`cargo test`
+  (54件、プロバイダー間の分離を含む)、`pnpm typecheck`/`pnpm lint`/
+  `pnpm test`/`pnpm build`、Xvfb実機起動まではこのサンドボックスで
+  確認済みだが、実際のOS資格情報ストア(Windows Credential Manager)
+  との往復動作(「APIキーを設定→アプリを再起動→再入力なしで使える」
+  こと)はクラウドサンドボックスからは検証できない。Windows実機での
+  確認が必要。あわせてv0.1.1としてのリリース(Auto Updateの実地
+  テスト: 稼働中のv0.1.0アプリが新バージョンを検知できるか)も
+  ユーザー側で確認予定。
